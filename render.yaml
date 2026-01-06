@@ -1,13 +1,12 @@
- services:
+# render.yaml
+services:
   - type: web
-    name: lily-ai-assistant
+    name: lily-flask-app
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn wsgi:app
     envVars:
+      - key: SECRET_KEY
+        generateValue: true
       - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: PORT
-        value: 10000
-    healthCheckPath: /health
-    autoDeploy: true
+        value: 3.9.0
