@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lily AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B8B;
+            --primary-dark: #FF4D6D;
+            --primary-light: #FF8FA3;
+            --secondary: #7B68EE;
+            --accent: #00D4FF;
+            --accent-dark: #00B8E6;
+            --success: #00E5A8;
+            --warning: #FFD166;
+            --dark: #0A0A14;
+            --dark-light: #1A1A2E;
+            --light: #FFFFFF;
+            --gray: #A0A0B0;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary), var(--accent));
+            --gradient-accent: linear-gradient(135deg, var(--accent), var(--success));
+            --gradient-dark: linear-gradient(135deg, var(--dark), var(--dark-light));
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            --shadow-light: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --transition-smooth: all 0.4s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient-dark);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Mobile First Design */
+        .mobile-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header */
+        .mobile-header {
+            background: linear-gradient(rgba(10, 10, 20, 0.95), rgba(26, 26, 46, 0.9));
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            object-fit: cover;
+        }
+
+        .header-text h1 {
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-text p {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .mobile-toggle {
+            background: var(--gradient-primary);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .mobile-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Content Area */
+        .mobile-main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chat Panel - Always Visible */
+        .mobile-chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            transition: var(--transition-smooth);
+            min-height: calc(100vh - 80px);
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .chat-info h3 {
+            font-size: 1.2em;
+            margin-bottom: 4px;
+        }
+
+        .chat-info p {
+            font-size: 0.8em;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 18px;
+            max-width: 85%;
+            animation: messageSlide 0.3s ease-out;
+            line-height: 1.5;
+            font-size: 0.95em;
+            word-wrap: break-word;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: var(--gradient-primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .assistant-message {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            margin-bottom: 15px;
+            max-width: 80px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .input-area {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        #userInput:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        #userInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .mobile-send-btn {
+            background: var(--gradient-primary);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .mobile-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Features Panel - Slide Over */
+        .mobile-features-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 20, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .mobile-features-panel.active {
+            transform: translateX(0);
+        }
+
+        .features-header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .features-header h2 {
+            font-size: 1.4em;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-features {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            color: var(--accent);
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .close-features:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .features-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Quick Commands */
+        .quick-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent);
+        }
+
+        .section-title i {
+            font-size: 1em;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .quick-command {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-command:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .quick-command.clicked {
+            animation: quickClick 0.4s ease;
+        }
+
+        @keyframes quickClick {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.95);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .quick-icon {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .quick-text {
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        /* AI Capabilities */
+        .capabilities-section {
+            margin-bottom: 30px;
+        }
+
+        .capability-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .capability-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .capability-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .capability-icon {
+            font-size: 1.3em;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 107, 139, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .capability-title {
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .capability-desc {
+            font-size: 0.85em;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        /* Action Buttons */
+        .mobile-actions {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-primary);
+            border: none;
+        }
+
+        /* Enhanced Music Player */
+        .music-player {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .music-player.active {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .music-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .music-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .music-details h4 {
+            font-size: 1em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .music-details p {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .control-btn.play-pause {
+            background: var(--gradient-primary);
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 15px rgba(255, 107, 139, 0.4);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin: 0 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 30%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .time {
+            font-size: 0.8em;
+            opacity: 0.7;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Web Preview */
+        .web-preview {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px;
+            display: none;
+        }
+
+        .web-preview.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .web-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .web-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+        }
+
+        .web-title {
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .web-content {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .web-content i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .web-content p {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .web-btn {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .web-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Animations */
+        .message.special {
+            animation: specialMessage 0.8s ease;
+        }
+
+        @keyframes specialMessage {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Creator Profile */
+        .creator-profile {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .creator-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .creator-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--accent);
+        }
+
+        .creator-title {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .creator-bio {
+            font-size: 0.85em;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* Floating Elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+            filter: blur(1px);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg) translateX(0);
+            }
+
+            33% {
+                transform: translateY(-30px) rotate(120deg) translateX(20px);
+            }
+
+            66% {
+                transform: translateY(10px) rotate(240deg) translateX(-20px);
+            }
+
+            100% {
+                transform: translateY(0) rotate(360deg) translateX(0);
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gradient-secondary);
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 1024px) {
+            body {
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: var(--gradient-dark);
+                min-height: 100vh;
+            }
+
+            .mobile-container {
+                max-width: 1400px;
+                width: 95%;
+                min-height: 850px;
+                height: 90vh;
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                box-shadow: var(--shadow);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(10, 10, 20, 0.8);
+                backdrop-filter: blur(25px);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mobile-main {
+                flex: 1;
+                display: flex;
+                flex-direction: row;
+                overflow: hidden;
+                height: calc(100% - 100px);
+            }
+
+            .mobile-features-panel {
+                position: relative;
+                width: 380px;
+                min-width: 380px;
+                transform: translateX(0);
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(10, 10, 20, 0.85);
+                overflow-y: auto;
+                height: 100%;
+                z-index: 1;
+            }
+
+            .mobile-chat-panel {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                height: 100%;
+            }
+
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto;
+                height: calc(100% - 200px);
+            }
+
+            .mobile-toggle {
+                display: none;
+            }
+
+            .features-header {
+                display: none;
+            }
+
+            /* Enhanced Desktop Header */
+            .mobile-header {
+                background: linear-gradient(rgba(10, 10, 20, 0.85), rgba(26, 26, 46, 0.8));
+                padding: 25px 30px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .mobile-header::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,107,139,0.1)"/></svg>');
+                background-size: cover;
+                z-index: 0;
+            }
+
+            .header-content {
+                position: relative;
+                z-index: 1;
+                justify-content: space-between;
+            }
+
+            .logo-section {
+                gap: 20px;
+            }
+
+            .mobile-logo {
+                width: 70px;
+                height: 70px;
+                border-radius: 20px;
+                border: 3px solid rgba(255, 255, 255, 0.2);
+                animation: logoFloat 6s ease-in-out infinite;
+            }
+
+            @keyframes logoFloat {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-10px) rotate(3deg);
+                }
+
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+            }
+
+            .header-text h1 {
+                font-size: 2.5em;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+
+            .header-text p {
+                font-size: 1.2em;
+            }
+
+            /* Enhanced Desktop Chat */
+            .chat-header {
+                padding: 25px;
+                margin-bottom: 20px;
+            }
+
+            .chat-avatar {
+                width: 70px;
+                height: 70px;
+                border-radius: 20px;
+                border: 3px solid var(--accent);
+                animation: avatarGlow 4s ease-in-out infinite;
+            }
+
+            @keyframes avatarGlow {
+                0% {
+                    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+                }
+
+                50% {
+                    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.6);
+                }
+
+                100% {
+                    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+                }
+            }
+
+            .chat-info h3 {
+                font-size: 1.4em;
+            }
+
+            .message {
+                padding: 18px 22px;
+                max-width: 75%;
+                font-size: 1em;
+            }
+
+            .input-area {
+                padding: 25px;
+            }
+
+            #userInput {
+                padding: 18px 22px;
+                font-size: 15px;
+            }
+
+            .mobile-send-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.2em;
+            }
+
+            /* Enhanced Quick Commands for Desktop */
+            .quick-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .quick-command {
+                padding: 18px;
+            }
+
+            .capability-card {
+                padding: 18px;
+            }
+
+            .mobile-actions {
+                padding: 25px;
+            }
+        }
+
+        /* Tablet Styles */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .quick-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .mobile-header {
+                padding: 20px 25px;
+            }
+
+            .mobile-logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .header-text h1 {
+                font-size: 1.6em;
+            }
+
+            .message {
+                max-width: 80%;
+            }
+
+            .mobile-actions {
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                min-width: 120px;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="static/avtar.jpg" alt="Lily Logo" class="mobile-logo"
+                        onerror="this.src='https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <div class="header-text">
+                        <h1>Lily AI Assistant</h1>
+                        <p>Your Intelligent Digital Companion</p>
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span>AI System Active - Ready to Assist</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="mobile-main">
+            <!-- Features Panel (Hidden on mobile by default) -->
+            <div class="mobile-features-panel" id="featuresPanel">
+                <div class="features-header">
+                    <h2>AI Capabilities</h2>
+                    <button class="close-features" id="closeFeatures">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="features-content">
+                    <!-- Quick Commands Section -->
+                    <div class="quick-section">
+                        <div class="section-title">
+                            <i class="fas fa-bolt"></i>
+                            <span>Quick Commands</span>
+                        </div>
+                        <div class="quick-grid">
+                            <div class="quick-command" onclick="sendQuickCommand('play shape of you')">
+                                <div class="quick-icon"><i class="fas fa-music"></i></div>
+                                <div class="quick-text">Play Music</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('open youtube')">
+                                <div class="quick-icon"><i class="fab fa-youtube"></i></div>
+                                <div class="quick-text">YouTube</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('open google')">
+                                <div class="quick-icon"><i class="fab fa-google"></i></div>
+                                <div class="quick-text">Google</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('news')">
+                                <div class="quick-icon"><i class="far fa-newspaper"></i></div>
+                                <div class="quick-text">Get News</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('time')">
+                                <div class="quick-icon"><i class="far fa-clock"></i></div>
+                                <div class="quick-text">Current Time</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('date')">
+                                <div class="quick-icon"><i class="far fa-calendar"></i></div>
+                                <div class="quick-text">Today's Date</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('joke')">
+                                <div class="quick-icon"><i class="far fa-grin-squint-tears"></i></div>
+                                <div class="quick-text">Tell a Joke</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('weather')">
+                                <div class="quick-icon"><i class="fas fa-cloud-sun"></i></div>
+                                <div class="quick-text">Weather</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('calculate 15 * 23')">
+                                <div class="quick-icon"><i class="fas fa-calculator"></i></div>
+                                <div class="quick-text">Calculator</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('story')">
+                                <div class="quick-icon"><i class="fas fa-book"></i></div>
+                                <div class="quick-text">Short Story</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('advice')">
+                                <div class="quick-icon"><i class="fas fa-lightbulb"></i></div>
+                                <div class="quick-text">Get Advice</div>
+                            </div>
+                            <div class="quick-command" onclick="sendQuickCommand('who created you')">
+                                <div class="quick-icon"><i class="fas fa-code"></i></div>
+                                <div class="quick-text">About Creator</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Capabilities Section -->
+                    <div class="capabilities-section">
+                        <div class="section-title">
+                            <i class="fas fa-star"></i>
+                            <span>AI Capabilities</span>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-music"></i></div>
+                                <div class="capability-title">Music Control</div>
+                            </div>
+                            <div class="capability-desc">
+                                Play 25+ popular songs directly from YouTube with full controls
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-globe"></i></div>
+                                <div class="capability-title">Web Navigation</div>
+                            </div>
+                            <div class="capability-desc">
+                                Direct access to YouTube, Google, GitHub, Netflix, Spotify, Amazon
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="far fa-newspaper"></i></div>
+                                <div class="capability-title">Live News</div>
+                            </div>
+                            <div class="capability-desc">
+                                Latest headlines and news updates from trusted sources
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-robot"></i></div>
+                                <div class="capability-title">AI Chat</div>
+                            </div>
+                            <div class="capability-desc">
+                                Intelligent conversations with smart command recognition
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="far fa-clock"></i></div>
+                                <div class="capability-title">Time & Date</div>
+                            </div>
+                            <div class="capability-desc">
+                                Current time, calendar information and scheduling
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="far fa-smile"></i></div>
+                                <div class="capability-title">Entertainment</div>
+                            </div>
+                            <div class="capability-desc">
+                                Jokes, advice, stories and fun interactions
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-calculator"></i></div>
+                                <div class="capability-title">Calculator</div>
+                            </div>
+                            <div class="capability-desc">
+                                Perform mathematical calculations and solve equations
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-lightbulb"></i></div>
+                                <div class="capability-title">Life Advice</div>
+                            </div>
+                            <div class="capability-desc">
+                                Get helpful advice for daily life and decision making
+                            </div>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-header">
+                                <div class="capability-icon"><i class="fas fa-microphone"></i></div>
+                                <div class="capability-title">Voice Commands</div>
+                            </div>
+                            <div class="capability-desc">
+                                Voice recognition support for hands-free operation
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Creator Profile Section -->
+                    <div class="creator-profile">
+                        <img src="static/image.jpg" alt="Faheem Ashraf" class="creator-image"
+                            onerror="this.src='https://media.istockphoto.com/id/1143736474/photo/dark-web-hooded-hacker.jpg?b=1&s=612x612&w=0&k=20&c=yetSirCAfQDxa6Dd5YHSpNnPt6r_67pLuxCsBXe29pE='">
+                        <div class="creator-name">Faheem Ashraf</div>
+                        <div class="creator-title">AI Developer & Creator</div>
+                        <div class="creator-bio">
+                            Passionate developer who believes in making technology accessible and helpful for everyone.
+                            Designed Lily AI to be your reliable digital companion for everyday tasks, entertainment,
+                            and assistance.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Panel (Always visible) -->
+            <div class="mobile-chat-panel">
+                <div class="chat-header">
+                    <img src="static/logo.jpg" alt="Lily Avatar" class="chat-avatar"
+                        onerror="this.src='https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <div class="chat-info">
+                        <h3>Lily Assistant</h3>
+                        <p><span class="status-dot"></span> Online & Ready to help!</p>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant-message">
+                        <strong>Hello! I'm Lily, your AI assistant!</strong><br>
+                        I can help you with music (25+ songs), websites, news, time, weather, jokes, stories,
+                        calculations, and much more!<br><br>
+                        Try saying <strong>"what can you do"</strong> to see all available commands or use the quick
+                        commands menu!
+                    </div>
+                </div>
+
+                <!-- Music Player -->
+                <div class="music-player" id="musicPlayer">
+                    <div class="music-info">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_cnLFo2-1dMsyu_QSS7XTPbRbj4A2q3DBRA&s"
+                            alt="Song Cover" class="music-cover">
+                        <div class="music-details">
+                            <h4 id="currentSong">Blinding Lights</h4>
+                            <p id="currentArtist">The Weeknd</p>
+                        </div>
+                    </div>
+                    <div class="music-controls">
+                        <button class="control-btn" id="prevBtn">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button class="control-btn play-pause" id="playPauseBtn">
+                            <i class="fas fa-play" id="playPauseIcon"></i>
+                        </button>
+                        <button class="control-btn" id="nextBtn">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                        <div class="progress-bar">
+                            <div class="progress" id="musicProgress"></div>
+                        </div>
+                        <div class="time" id="currentTime">0:00</div>
+                    </div>
+                </div>
+
+                <!-- Web Preview -->
+                <div class="web-preview" id="webPreview">
+                    <div class="web-header">
+                        <div class="web-icon" id="webIcon">
+                            <i class="fab fa-google"></i>
+                        </div>
+                        <div class="web-title" id="webTitle">Google</div>
+                    </div>
+                    <div class="web-content">
+                        <i class="fab fa-google" id="webContentIcon"></i>
+                        <p id="webContentText">Search the world's information, including webpages, images, videos and
+                            more.</p>
+                        <button class="web-btn" id="webOpenBtn">Open Website</button>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="Ask me anything or say 'play music'..."
+                        onkeypress="handleKeyPress(event)">
+                    <button class="mobile-send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <div class="mobile-actions">
+                    <button class="action-btn" onclick="clearChat()">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
+                    <button class="action-btn" onclick="showHelp()">
+                        <i class="fas fa-question-circle"></i> Help
+                    </button>
+                    <button class="action-btn" onclick="toggleTheme()">
+                        <i class="fas fa-palette"></i> Theme
+                    </button>
+                    <button class="action-btn" onclick="startVoiceRecognition()">
+                        <i class="fas fa-microphone"></i> Voice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Mobile Navigation
+        const featuresPanel = document.getElementById('featuresPanel');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const closeFeatures = document.getElementById('closeFeatures');
+
+        function toggleFeatures() {
+            featuresPanel.classList.toggle('active');
+        }
+
+        mobileToggle.addEventListener('click', toggleFeatures);
+        closeFeatures.addEventListener('click', toggleFeatures);
+
+        // Close features when clicking on quick commands (mobile)
+        document.querySelectorAll('.quick-command').forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.classList.add('clicked');
+                setTimeout(() => {
+                    this.classList.remove('clicked');
+                }, 400);
+
+                if (window.innerWidth < 1024) {
+                    setTimeout(() => {
+                        featuresPanel.classList.remove('active');
+                    }, 300);
+                }
+            });
+        });
+
+        // Enhanced Theme Management
+        let isDarkTheme = true;
+
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            const root = document.documentElement;
+
+            if (isDarkTheme) {
+                // Dark theme
+                root.style.setProperty('--primary', '#FF6B8B');
+                root.style.setProperty('--secondary', '#7B68EE');
+                root.style.setProperty('--accent', '#00D4FF');
+                root.style.setProperty('--success', '#00E5A8');
+                root.style.setProperty('--dark', '#0A0A14');
+                root.style.setProperty('--dark-light', '#1A1A2E');
+                root.style.setProperty('--light', '#FFFFFF');
+            } else {
+                // Light theme
+                root.style.setProperty('--primary', '#FF4D6D');
+                root.style.setProperty('--secondary', '#6A5ACD');
+                root.style.setProperty('--accent', '#0099CC');
+                root.style.setProperty('--success', '#00CC99');
+                root.style.setProperty('--dark', '#F0F0F5');
+                root.style.setProperty('--dark-light', '#E0E0EB');
+                root.style.setProperty('--light', '#1A1A2E');
+            }
+
+            addMessage(`Theme switched to ${isDarkTheme ? 'Dark' : 'Light'} mode`, 'assistant');
+        }
+
+        // Real Music Library with YouTube Links
+        const musicLibrary = {
+            "shape of you": {
+                title: "Shape of You",
+                artist: "Ed Sheeran",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=JGwWNGJdvx8"
+            },
+            "believer": {
+                title: "Believer",
+                artist: "Imagine Dragons",
+                cover: "https://images.unsplash.com/photo-1571974599782-87624638275f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=7wtfhZwyrcc"
+            },
+            "faded": {
+                title: "Faded",
+                artist: "Alan Walker",
+                cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=60ItHLz5WEA"
+            },
+            "tum hi ho": {
+                title: "Tum Hi Ho",
+                artist: "Arijit Singh",
+                cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/shorts/yLzsCp7q9Y8"
+            },
+            "gerua": {
+                title: "Gerua",
+                artist: "Arijit Singh & Antara Mitra",
+                cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=9D9dY9nYhuw"
+            },
+            "radha": {
+                title: "Radha",
+                artist: "Shreya Ghoshal",
+                cover: "https://images.unsplash.com/photo-1571974599782-87624638275f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=Z_dbZGqe_4I"
+            },
+            "so high": {
+                title: "So High",
+                artist: "Sidhu Moose Wala",
+                cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=UqUv4VBB-7c"
+            },
+            "flowers": {
+                title: "Flowers",
+                artist: "Miley Cyrus",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=G7KNmW9a75Y"
+            },
+            "as it was": {
+                title: "As It Was",
+                artist: "Harry Styles",
+                cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=H5v3kku4y6Q"
+            },
+            "stay": {
+                title: "Stay",
+                artist: "The Kid LAROI & Justin Bieber",
+                cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=kTJczUoc26U"
+            },
+            "levitating": {
+                title: "Levitating",
+                artist: "Dua Lipa",
+                cover: "https://images.unsplash.com/photo-1571974599782-87624638275f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=TUVcZfQe-Kw"
+            },
+            "blinding lights": {
+                title: "Blinding Lights",
+                artist: "The Weeknd",
+                cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=4NRXx6U8ABQ"
+            },
+            "dance monkey": {
+                title: "Dance Monkey",
+                artist: "Tones and I",
+                cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=q0hyYWKXF0Q"
+            },
+            "perfect": {
+                title: "Perfect",
+                artist: "Ed Sheeran",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=2Vv-BfVoq4g"
+            },
+            "see you again": {
+                title: "See You Again",
+                artist: "Wiz Khalifa ft. Charlie Puth",
+                cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=RgKAFK5djSk"
+            },
+            "despacito": {
+                title: "Despacito",
+                artist: "Luis Fonsi ft. Daddy Yankee",
+                cover: "https://images.unsplash.com/photo-1571974599782-87624638275f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=kJQP7kiw5Fk"
+            },
+            "uptown funk": {
+                title: "Uptown Funk",
+                artist: "Mark Ronson ft. Bruno Mars",
+                cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=OPf0YbXqDm0"
+            },
+            "bad guy": {
+                title: "Bad Guy",
+                artist: "Billie Eilish",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=DyDfgMOUjCI"
+            },
+            "senorita": {
+                title: "Señorita",
+                artist: "Shawn Mendes & Camila Cabello",
+                cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=Pkh8UtuejGw"
+            },
+            "old town road": {
+                title: "Old Town Road",
+                artist: "Lil Nas X ft. Billy Ray Cyrus",
+                cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=r7qovpFAGrQ"
+            },
+            "cheap thrills": {
+                title: "Cheap Thrills",
+                artist: "Sia ft. Sean Paul",
+                cover: "https://images.unsplash.com/photo-1571974599782-87624638275f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=nYh-n7EOtMA"
+            },
+            "happier": {
+                title: "Happier",
+                artist: "Marshmello ft. Bastille",
+                cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=m7Bc3pLyij0"
+            },
+            "rockstar": {
+                title: "Rockstar",
+                artist: "Post Malone ft. 21 Savage",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=UceaB4D0jpo"
+            },
+            "god's plan": {
+                title: "God's Plan",
+                artist: "Drake",
+                cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                url: "https://www.youtube.com/watch?v=xpVfcZ0ZcFM"
+            }
+        };
+
+        // Music Player Functionality
+        const musicPlayer = document.getElementById('musicPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const musicProgress = document.getElementById('musicProgress');
+        const currentTime = document.getElementById('currentTime');
+        const currentSong = document.getElementById('currentSong');
+        const currentArtist = document.getElementById('currentArtist');
+
+        let isPlaying = false;
+        let currentTrackIndex = 0;
+        let currentTrack = null;
+        const trackKeys = Object.keys(musicLibrary);
+
+        // Function to play specific song by name
+        function playSpecificSong(songName) {
+            const normalizedSongName = songName.toLowerCase().trim();
+
+            // Find the song in the library
+            if (musicLibrary[normalizedSongName]) {
+                currentTrack = musicLibrary[normalizedSongName];
+                currentTrackIndex = trackKeys.indexOf(normalizedSongName);
+                playMusic();
+                return true;
+            } else {
+                // Try to find partial matches
+                for (const key of trackKeys) {
+                    if (key.includes(normalizedSongName) || normalizedSongName.includes(key)) {
+                        currentTrack = musicLibrary[key];
+                        currentTrackIndex = trackKeys.indexOf(key);
+                        playMusic();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        function playMusic() {
+            if (!currentTrack) {
+                // If no specific track, play the first one
+                currentTrack = musicLibrary[trackKeys[0]];
+                currentTrackIndex = 0;
+            }
+
+            musicPlayer.classList.add('active');
+            isPlaying = true;
+            playPauseIcon.classList.remove('fa-play');
+            playPauseIcon.classList.add('fa-pause');
+            updateMusicInfo();
+            simulateMusicProgress();
+
+            // Open YouTube in new tab for the actual song
+            setTimeout(() => {
+                window.open(currentTrack.url, '_blank');
+            }, 1000);
+
+            return true;
+        }
+
+        function pauseMusic() {
+            isPlaying = false;
+            playPauseIcon.classList.remove('fa-pause');
+            playPauseIcon.classList.add('fa-play');
+        }
+
+        function updateMusicInfo() {
+            if (currentTrack) {
+                currentSong.textContent = currentTrack.title;
+                currentArtist.textContent = currentTrack.artist;
+                document.querySelector('.music-cover').src = currentTrack.cover;
+            }
+        }
+
+        function simulateMusicProgress() {
+            if (isPlaying) {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    if (!isPlaying) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    progress += 0.5;
+                    if (progress > 100) {
+                        progress = 0;
+                        nextTrack();
+                    }
+                    musicProgress.style.width = `${progress}%`;
+
+                    // Update time (simulated)
+                    const minutes = Math.floor(progress / 100 * 3);
+                    const seconds = Math.floor((progress / 100 * 180) % 60);
+                    currentTime.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }, 1000);
+            }
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % trackKeys.length;
+            currentTrack = musicLibrary[trackKeys[currentTrackIndex]];
+            updateMusicInfo();
+            musicProgress.style.width = '0%';
+            currentTime.textContent = '0:00';
+
+            // Open next song in YouTube
+            if (isPlaying) {
+                setTimeout(() => {
+                    window.open(currentTrack.url, '_blank');
+                }, 500);
+            }
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + trackKeys.length) % trackKeys.length;
+            currentTrack = musicLibrary[trackKeys[currentTrackIndex]];
+            updateMusicInfo();
+            musicProgress.style.width = '0%';
+            currentTime.textContent = '0:00';
+
+            // Open previous song in YouTube
+            if (isPlaying) {
+                setTimeout(() => {
+                    window.open(currentTrack.url, '_blank');
+                }, 500);
+            }
+        }
+
+        // Event Listeners for Music Controls
+        playPauseBtn.addEventListener('click', function () {
+            if (isPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        });
+
+        nextBtn.addEventListener('click', nextTrack);
+        prevBtn.addEventListener('click', prevTrack);
+
+        // Web Preview Functionality - Direct Opening
+        const webPreview = document.getElementById('webPreview');
+        const webIcon = document.getElementById('webIcon');
+        const webTitle = document.getElementById('webTitle');
+        const webContentIcon = document.getElementById('webContentIcon');
+        const webContentText = document.getElementById('webContentText');
+        const webOpenBtn = document.getElementById('webOpenBtn');
+
+        let currentWebsite = '';
+
+        function openWebsiteDirectly(website) {
+            const websites = {
+                'youtube': {
+                    icon: 'fab fa-youtube',
+                    title: 'YouTube',
+                    text: 'Enjoy your favorite videos and music, and upload your own content to share with friends, family, and the world.',
+                    url: 'https://www.youtube.com'
+                },
+                'google': {
+                    icon: 'fab fa-google',
+                    title: 'Google',
+                    text: 'Search the world\'s information, including webpages, images, videos and more.',
+                    url: 'https://www.google.com'
+                },
+                'github': {
+                    icon: 'fab fa-github',
+                    title: 'GitHub',
+                    text: 'GitHub is where over 100 million developers shape the future of software together.',
+                    url: 'https://www.github.com'
+                },
+                'netflix': {
+                    icon: 'fab fa-netflix',
+                    title: 'Netflix',
+                    text: 'Watch TV shows and movies anytime, anywhere.',
+                    url: 'https://www.netflix.com'
+                },
+                'spotify': {
+                    icon: 'fab fa-spotify',
+                    title: 'Spotify',
+                    text: 'Music for everyone. Millions of songs.',
+                    url: 'https://www.spotify.com'
+                },
+                'amazon': {
+                    icon: 'fab fa-amazon',
+                    title: 'Amazon',
+                    text: 'Online shopping for electronics, apparel, and more.',
+                    url: 'https://www.amazon.com'
+                }
+            };
+
+            const site = websites[website];
+            if (site) {
+                currentWebsite = website;
+                // Show preview briefly then open directly
+                webPreview.classList.add('active');
+                webIcon.innerHTML = `<i class="${site.icon}"></i>`;
+                webTitle.textContent = site.title;
+                webContentIcon.className = site.icon;
+                webContentText.textContent = `Opening ${site.title}...`;
+
+                // Open website directly after a short delay
+                setTimeout(() => {
+                    window.open(site.url, '_blank');
+                }, 800);
+
+                return true;
+            }
+            return false;
+        }
+
+        webOpenBtn.addEventListener('click', function () {
+            if (currentWebsite) {
+                const websites = {
+                    'youtube': 'https://www.youtube.com',
+                    'google': 'https://www.google.com',
+                    'github': 'https://www.github.com',
+                    'netflix': 'https://www.netflix.com',
+                    'spotify': 'https://www.spotify.com',
+                    'amazon': 'https://www.amazon.com'
+                };
+                window.open(websites[currentWebsite], '_blank');
+            }
+        });
+
+        // Enhanced Command Processing with Real Music Library
+        function processCommand(command) {
+            const lowerCommand = command.toLowerCase().trim();
+
+            // Music Commands - Search and play specific songs
+            if (lowerCommand.includes('play') || lowerCommand.includes('music') || lowerCommand.includes('song')) {
+                // Extract song name from command
+                let songName = lowerCommand.replace(/play|music|song|by|from/g, '').trim();
+
+                // Remove common prefixes
+                songName = songName.replace(/^the|^a|^some/g, '').trim();
+
+                if (songName && songName !== 'play' && songName !== 'music' && songName !== 'song') {
+                    // Try to play specific song
+                    if (playSpecificSong(songName)) {
+                        return `🎵 Playing: "${currentTrack.title}" by ${currentTrack.artist}\n\n• Song opened in YouTube\n• Use music player controls for navigation\n• Say "next" or "previous" to change songs`;
+                    } else {
+                        // If specific song not found, show available songs
+                        const availableSongs = trackKeys.slice(0, 8).join(', ');
+                        return `I couldn't find "${songName}" in my library. Available songs:\n\n${availableSongs}\n\nTry: "play [song name]" or just "play music" for a random song`;
+                    }
+                } else {
+                    // Play random song
+                    const randomKey = trackKeys[Math.floor(Math.random() * trackKeys.length)];
+                    currentTrack = musicLibrary[randomKey];
+                    currentTrackIndex = trackKeys.indexOf(randomKey);
+                    playMusic();
+                    return `🎵 Playing random song: "${currentTrack.title}" by ${currentTrack.artist}\n\n• Song opened in YouTube\n• Use music player to control playback`;
+                }
+            }
+
+            // Music control commands
+            if (lowerCommand.includes('pause') || lowerCommand.includes('stop')) {
+                if (musicPlayer.classList.contains('active')) {
+                    pauseMusic();
+                    return "⏸️ Music paused. Click play to resume or say 'play music' to continue.";
+                }
+                return "No music is currently playing.";
+            }
+
+            if (lowerCommand.includes('next') || lowerCommand.includes('skip')) {
+                if (musicPlayer.classList.contains('active')) {
+                    nextTrack();
+                    return `⏭️ Skipped to: "${currentTrack.title}" by ${currentTrack.artist}`;
+                }
+                return "No music is currently playing.";
+            }
+
+            if (lowerCommand.includes('previous') || lowerCommand.includes('back')) {
+                if (musicPlayer.classList.contains('active')) {
+                    prevTrack();
+                    return `⏮️ Went back to: "${currentTrack.title}" by ${currentTrack.artist}`;
+                }
+                return "No music is currently playing.";
+            }
+
+            // Web Navigation - Direct Opening
+            if (lowerCommand.includes('open') || lowerCommand.includes('website') || lowerCommand.includes('browse')) {
+                if (lowerCommand.includes('youtube')) {
+                    if (openWebsiteDirectly('youtube')) {
+                        return "Opening YouTube directly...";
+                    }
+                }
+                if (lowerCommand.includes('google')) {
+                    if (openWebsiteDirectly('google')) {
+                        return "Opening Google directly...";
+                    }
+                }
+                if (lowerCommand.includes('github')) {
+                    if (openWebsiteDirectly('github')) {
+                        return "Opening GitHub directly...";
+                    }
+                }
+                if (lowerCommand.includes('netflix')) {
+                    if (openWebsiteDirectly('netflix')) {
+                        return "Opening Netflix directly...";
+                    }
+                }
+                if (lowerCommand.includes('spotify')) {
+                    if (openWebsiteDirectly('spotify')) {
+                        return "Opening Spotify directly...";
+                    }
+                }
+                if (lowerCommand.includes('amazon')) {
+                    if (openWebsiteDirectly('amazon')) {
+                        return "Opening Amazon directly...";
+                    }
+                }
+                return "I can open: YouTube, Google, GitHub, Netflix, Spotify, Amazon. Try: 'open youtube'";
+            }
+
+            // Show available songs command
+            if (lowerCommand.includes('songs') || lowerCommand.includes('music list') || lowerCommand.includes('available songs')) {
+                const songList = trackKeys.map(song => `• ${musicLibrary[song].title} - ${musicLibrary[song].artist}`).join('\n');
+                return `🎵 Available Songs (${trackKeys.length} total):\n\n${songList}\n\nSay "play [song name]" to play any of these songs!`;
+            }
+
+            // News Commands
+            if (lowerCommand.includes('news') || lowerCommand.includes('headline') || lowerCommand.includes('update')) {
+                return `📰 Latest News Headlines:
+
+• AI Technology Reaches New Milestones in Healthcare
+• Space Exploration: Mars Mission Updates Revealed  
+• Climate Change Solutions Making Significant Progress
+• Tech Giants Announce Groundbreaking Innovations
+• Global Economy Shows Positive Growth Trends
+
+For specific news, try: "tech news", "sports news", or "business updates"`;
+            }
+
+            // Time & Date
+            if (lowerCommand.includes('time') || lowerCommand.includes('clock')) {
+                const now = new Date();
+                return `🕒 Current Time: ${now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                })}`;
+            }
+
+            if (lowerCommand.includes('date') || lowerCommand.includes('today') || lowerCommand.includes('day')) {
+                const now = new Date();
+                return `📅 Today is: ${now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}`;
+            }
+
+            // Weather
+            if (lowerCommand.includes('weather') || lowerCommand.includes('temperature') || lowerCommand.includes('forecast')) {
+                // Extract location if provided
+                let location = '';
+                if (lowerCommand.includes('in')) {
+                    location = lowerCommand.split('in')[1].trim();
+                }
+
+                const locationText = location ? ` in ${location}` : '';
+                return `🌤️ Weather Information${locationText}:
+
+Currently: Partly Cloudy, 72°F (22°C)
+Today: High 75°F (24°C), Low 65°F (18°C)
+Humidity: 65%, Wind: 8 mph NE
+Condition: Perfect day to go outside!
+
+For more detailed forecasts, try: "weather in [city name]"`;
+            }
+
+            // Jokes & Entertainment
+            if (lowerCommand.includes('joke') || lowerCommand.includes('funny') || lowerCommand.includes('laugh')) {
+                const jokes = [
+                    "Why don't scientists trust atoms? Because they make up everything!",
+                    "Why did the scarecrow win an award? He was outstanding in his field!",
+                    "Why don't eggs tell jokes? They'd crack each other up!",
+                    "What do you call a fake noodle? An impasta!",
+                    "Why did the math book look so sad? Because it had too many problems!",
+                    "What do you call a sleeping bull? A bulldozer!",
+                    "Why don't skeletons fight each other? They don't have the guts!",
+                    "What do you call a bear with no teeth? A gummy bear!"
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+
+            // Stories
+            if (lowerCommand.includes('story') || lowerCommand.includes('tale') || lowerCommand.includes('narrative')) {
+                const stories = [
+                    `The Mysterious Forest\n\nOnce upon a time, in a forest where trees whispered secrets, a young explorer discovered a glowing crystal that could understand animal languages. She used it to help forest creatures live in harmony, learning that true magic lies in understanding and kindness.`,
+
+                    `The Star Collector\n\nEvery night, an old astronomer would collect fallen stars in a special net. One evening, a tiny star asked to stay with him, and together they created the most beautiful constellations, teaching everyone that even the smallest light can make a big difference.`,
+
+                    `The Time Traveler's Garden\n\nIn a hidden garden where flowers bloomed in different time periods, a curious gardener discovered she could travel through time by touching specific flowers. She used this gift to fix small mistakes in history, learning that every moment is precious.`,
+
+                    `The Whispering Ocean\n\nA young sailor discovered that the ocean could speak during full moons. The waves shared ancient stories of sunken cities and lost treasures, teaching him that the greatest wealth is knowledge and friendship.`
+                ];
+                return stories[Math.floor(Math.random() * stories.length)];
+            }
+
+            // Calculator
+            if (lowerCommand.includes('calculate') || lowerCommand.includes('math') || lowerCommand.includes('solve') ||
+                lowerCommand.includes('+') || lowerCommand.includes('-') || lowerCommand.includes('*') || lowerCommand.includes('/')) {
+
+                try {
+                    // Extract math expression
+                    const mathMatch = lowerCommand.match(/(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)/);
+                    if (mathMatch) {
+                        const num1 = parseFloat(mathMatch[1]);
+                        const operator = mathMatch[2];
+                        const num2 = parseFloat(mathMatch[3]);
+
+                        let result;
+                        switch (operator) {
+                            case '+': result = num1 + num2; break;
+                            case '-': result = num1 - num2; break;
+                            case '*': result = num1 * num2; break;
+                            case '/': result = num2 !== 0 ? num1 / num2 : 'Error: Division by zero'; break;
+                            default: result = 'Unknown operation';
+                        }
+
+                        return `🔢 Calculation: ${num1} ${operator} ${num2} = ${result}`;
+                    } else {
+                        return `🔢 I can help with calculations! Try:\n\n"calculate 15 + 23"\n"calculate 100 / 5"\n"calculate 8 * 7"\n"calculate 50 - 15"`;
+                    }
+                } catch (error) {
+                    return "I couldn't understand that calculation. Try something like: 'calculate 15 + 23'";
+                }
+            }
+
+            // Advice
+            if (lowerCommand.includes('advice') || lowerCommand.includes('suggestion') || lowerCommand.includes('tip')) {
+                const adviceList = [
+                    "💡 Life Advice: Take time to appreciate small moments - they often become cherished memories.",
+                    "💡 Productivity Tip: Break big tasks into smaller steps. Progress, no matter how small, is still progress!",
+                    "💡 Wellness Tip: Remember to stay hydrated and take short breaks throughout your day.",
+                    "💡 Learning Advice: The expert in anything was once a beginner. Keep learning and growing!",
+                    "💡 Relationship Tip: Communication is key. Always express your feelings honestly and listen actively.",
+                    "💡 Financial Advice: Save at least 20% of your income and invest in your future self.",
+                    "💡 Career Tip: Network genuinely and always be learning new skills in your field."
+                ];
+                return adviceList[Math.floor(Math.random() * adviceList.length)];
+            }
+
+            // About & Creator
+            if ((lowerCommand.includes('who') || lowerCommand.includes('creator') || lowerCommand.includes('owner') || lowerCommand.includes('made')) &&
+                (lowerCommand.includes('create') || lowerCommand.includes('owner') || lowerCommand.includes('made') || lowerCommand.includes('faheem'))) {
+                return `👨‍💻 About My Creator\n\nI was created by Faheem Ashraf, a passionate developer who believes in making technology accessible and helpful for everyone!\n\nHe designed me to be your reliable digital companion for everyday tasks, entertainment, and assistance. My mission is to make your life easier and more enjoyable!\n\nWith features like music playback, web navigation, news, and intelligent conversations, I'm here to assist you 24/7!`;
+            }
+
+            // Help & Capabilities
+            if (lowerCommand.includes('what can you do') || lowerCommand.includes('help') || lowerCommand.includes('capabilities') || lowerCommand.includes('commands')) {
+                return `🌟 Lily AI - Your Complete Assistant\n\n🎵 Music & Entertainment\n• Play specific songs (${trackKeys.length}+ available)\n• Music player with controls\n• YouTube integration\n\n🌐 Web & Information\n• Open websites directly (YouTube, Google, GitHub, Netflix, Spotify, Amazon)\n• Get latest news\n• Search information\n\n📅 Time & Organization\n• Current time and date\n• Weather information\n• Calendar functions\n\n🔢 Tools & Utilities\n• Mathematical calculations\n• Unit conversions\n• Problem solving\n\n💡 Life Assistance\n• Advice and suggestions\n• Learning support\n• Daily motivation\n\n😊 Entertainment\n• Interactive stories\n• Fun facts & jokes\n• Creative writing\n\n🎯 Quick Commands:\n• "play [song name]" - Play specific song\n• "open youtube" - Open website\n• "news" - Latest headlines\n• "time/date" - Current time/date\n• "weather" - Weather info\n• "joke" - Tell a joke\n• "story" - Short story\n• "calculate" - Math operations\n• "advice" - Life advice\n• "songs" - Show available songs`;
+            }
+
+            // Default response for unknown commands
+            return `I understand you're looking for: "${command}"\n\nI can help you with:\n• Playing music (${trackKeys.length}+ songs available)\n• Opening websites directly\n• Getting news, time, weather\n• Telling jokes & stories\n• Mathematical calculations\n• Life advice & suggestions\n\nTry these commands:\n• "play shape of you"\n• "open youtube" \n• "what can you do"\n• "what songs are available"\n• "tell me a joke"`;
+        }
+
+        // Enhanced Chat Functionality
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            showTyping();
+
+            setTimeout(() => {
+                hideTyping();
+                const response = processCommand(message);
+                addMessage(response, 'assistant', true);
+            }, 800 + Math.random() * 800);
+        }
+
+        function sendQuickCommand(command) {
+            document.getElementById('userInput').value = command;
+            sendMessage();
+        }
+
+        function addMessage(text, sender, special = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            if (special) messageDiv.classList.add('special');
+
+            // Convert line breaks and format text
+            text = text.replace(/\n/g, '<br>');
+            // Add emphasis to bold text
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            messageDiv.innerHTML = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function clearChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+        <div class="message assistant-message">
+            <strong>Hello! I'm Lily, your AI assistant!</strong><br>
+            I can help you with music, websites, news, time, weather, jokes, stories, calculations, and much more!<br><br>
+            Try saying <strong>"what can you do"</strong> to see all available commands!
+        </div>
+    `;
+            musicPlayer.classList.remove('active');
+            webPreview.classList.remove('active');
+            isPlaying = false;
+            playPauseIcon.classList.remove('fa-pause');
+            playPauseIcon.classList.add('fa-play');
+        }
+
+        function showHelp() {
+            sendQuickCommand('what can you do');
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', function (event) {
+            // Ctrl + / for help
+            if (event.ctrlKey && event.key === '/') {
+                event.preventDefault();
+                showHelp();
+            }
+
+            // Escape to close panels
+            if (event.key === 'Escape') {
+                if (window.innerWidth < 1024 && featuresPanel.classList.contains('active')) {
+                    featuresPanel.classList.remove('active');
+                }
+            }
+
+            // Space to play/pause music when music player is active
+            if (event.key === ' ' && musicPlayer.classList.contains('active') && event.target.id !== 'userInput') {
+                event.preventDefault();
+                if (isPlaying) {
+                    pauseMusic();
+                } else {
+                    playMusic();
+                }
+            }
+        });
+
+        // Auto-focus input
+        document.getElementById('userInput').focus();
+
+        // Create floating elements
+        document.addEventListener('DOMContentLoaded', function () {
+            const floatingContainer = document.getElementById('floatingElements');
+            const colors = [
+                'rgba(255, 107, 139, 0.3)',
+                'rgba(123, 104, 238, 0.3)',
+                'rgba(0, 212, 255, 0.3)',
+                'rgba(0, 229, 168, 0.3)'
+            ];
+
+            for (let i = 0; i < 15; i++) {
+                const size = Math.random() * 100 + 30;
+                const top = Math.random() * 100;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 30 + 20;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                element.style.top = `${top}%`;
+                element.style.left = `${left}%`;
+                element.style.animationDuration = `${duration}s`;
+                element.style.background = color;
+                element.style.animationDelay = `${Math.random() * 5}s`;
+
+                floatingContainer.appendChild(element);
+            }
+        });
+
+        // Handle window resize and initialization
+        function initializeLayout() {
+            if (window.innerWidth >= 1024) {
+                featuresPanel.classList.add('active');
+                // Ensure proper scrolling containers
+                document.querySelector('.mobile-features-panel').style.overflowY = 'auto';
+                document.querySelector('.chat-messages').style.overflowY = 'auto';
+            } else {
+                featuresPanel.classList.remove('active');
+            }
+        }
+
+        window.addEventListener('resize', initializeLayout);
+        initializeLayout(); // Initial call
+
+        // Add image error handling
+        document.addEventListener('DOMContentLoaded', function () {
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('error', function () {
+                    console.log(`Image ${this.alt} failed to load`);
+                });
+            });
+        });
+
+        // Voice Command Support (Bonus Feature)
+        function startVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = function () {
+                    addMessage("Listening... Speak now", 'assistant');
+                };
+
+                recognition.onresult = function (event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('userInput').value = transcript;
+                    sendMessage();
+                };
+
+                recognition.onerror = function (event) {
+                    addMessage("Voice recognition error. Please try typing instead.", 'assistant');
+                };
+
+                recognition.start();
+            } else {
+                addMessage("Voice recognition not supported in your browser. Please type your commands.", 'assistant');
+            }
+        }
+
+        // Add voice command button to mobile actions
+        document.querySelector('.mobile-actions').innerHTML += `
+    <button class="action-btn" onclick="startVoiceRecognition()">
+        <i class="fas fa-microphone"></i> Voice
+    </button>
+`;
+    </script>
+</body>
+
+</html>
