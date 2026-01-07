@@ -1,19 +1,17 @@
-# app/__init__.py
-from flask import Flask
 import os
+from flask import Flask
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     
-    # Set a secret key (IMPORTANT for sessions, forms, etc.)
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    # Set secret key
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
     
-    # Import and register routes
-    from app import routes
-    app.register_blueprint(routes.main_routes)
+    # Import routes
+    from app.routes import main_routes
+    app.register_blueprint(main_routes)
     
     return app
