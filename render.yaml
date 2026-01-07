@@ -3,7 +3,7 @@ services:
     name: my-ai-assistant 
     env: python 
     buildCommand: pip install -r requirements.txt 
-    startCommand: gunicorn "wsgi:app" 
+    startCommand: gunicorn "app:app" 
     envVars: 
       - key: SECRET_KEY 
         generateValue: true 
